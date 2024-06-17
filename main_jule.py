@@ -81,7 +81,7 @@ if selected_person_data:
             st.session_state.threshold = st.slider("Wähle den Schwellenwert für die Peaks:", min_value=0, max_value=1000, value=345)
             st.session_state.end_index = st.slider("Wähle die Länge des zu betrachtenden Zeitbereichs:", min_value=0, max_value=len(ekg.df), value=10000)
             st.session_state.sampling_rate = st.slider("Wähle die Abtastrate:", min_value=1, max_value=10000, value=1000)
-            st.session_state.smooth_window_size = st.slider("Wähle die Auflösung der Herzfrequenz-Anzeige:", min_value=1, max_value=10000, value=100)
+            st.session_state.smooth_window_size = st.slider("Wähle die Auflösung der Herzfrequenz-Anzeige:", min_value=1, max_value=1000, value=100)
  
 else:
     st.write("Keine Daten für die ausgewählte Person gefunden.")

@@ -69,7 +69,7 @@ class EKGdata:
     
         #return df
         
-    def calculate_HR(peaks, sampling_rate=1000, smooth_window_size=3):
+    def calculate_HR(peaks, sampling_rate=1000, smooth_window_size=None):
     
         peak_intervals = pd.Series(peaks).diff().iloc[1:] / sampling_rate
         heart_rates = 60 / peak_intervals
