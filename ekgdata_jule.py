@@ -18,6 +18,7 @@ class EKGdata:
         self.date = ekg_dict["date"]
         self.data = ekg_dict["result_link"]
         self.df = pd.read_csv(self.data, sep='\t', header=None, names=['EKG in mV','Time in ms',])
+        self.df['Time in s'] = self.df['Time in ms'] / 1000
     
     @staticmethod  
     def load_ekg_data():
@@ -58,26 +59,19 @@ class EKGdata:
                 peaks.append(index-respacing_factor)
 
         return peaks
-    
-   # def calculate_HR(peaks, respacing_factor=5, sampling_rate=1000):
-    #    peak_intervals = pd.Series(peaks).diff()
-        #peak_intervals_seconds = peak_intervals / (sampling_rate / respacing_factor) #in sekunden
-     #   heart_rates = 60 / peak_intervals
-      #  heart_rates = heart_rates.dropna()*2
-    
-       # df = pd.DataFrame({'Zeitpunkt': peaks[1:], 'Herzfrequenz': heart_rates})
-    
-        #return df
+
         
     def calculate_HR(peaks, sampling_rate=1000, smooth_window_size=None):
     
+        timepoints = [peak / 1000 for peak in peaks[1:]]
+        
         peak_intervals = pd.Series(peaks).diff().iloc[1:] / sampling_rate
         heart_rates = 60 / peak_intervals
         
         # Glättung der Herzfrequenzdaten durch Moving Average
         smoothed_heart_rates = heart_rates.rolling(window=smooth_window_size, min_periods=1).mean()
     
-        timepoints = peaks[1:]
+        
     
         df = pd.DataFrame({'Zeitpunkt': timepoints, 'Herzfrequenz': smoothed_heart_rates})
         
@@ -96,14 +90,14 @@ class EKGdata:
         df = df.iloc[start_index:end_index]
         
         peaks_in_range = [peak for peak in peaks if start_index <= peak < end_index]
-        peak_times = df.iloc[peaks_in_range]['Time in ms']
+        peak_times = df.iloc[peaks_in_range]['Time in s']
         peak_values = df.iloc[peaks_in_range]['EKG in mV']
         
         fig = go.Figure()
 
         # EKG-Daten plotten
         fig.add_trace(go.Scatter(
-            x=df['Time in ms'], 
+            x=df['Time in s'], 
             y=df['EKG in mV'],
             mode='lines',
             name='EKG Data'))
@@ -118,8 +112,8 @@ class EKGdata:
 
         # Layout anpassen
         fig.update_layout(
-            title='EKG Data',
-            xaxis_title='Time in ms',
+            title='EKG Daten',
+            xaxis_title='Time in s',
             yaxis_title='EKG in mV',
             showlegend=True)
 
