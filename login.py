@@ -23,5 +23,8 @@ def login():
             st.session_state['authenticated'] = True
             st.success("Login erfolgreich!")
             st.sidebar.write("Willkommen, " + username + "!")
+            st.session_state['page'] = 'ekg_daten'
+            st.experimental_rerun()
         else:
             st.error("Ungültiger Benutzername oder Passwort")
+

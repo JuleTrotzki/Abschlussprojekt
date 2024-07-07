@@ -1,8 +1,10 @@
 
+from turtle import home
 import streamlit as st
 from ekg_anzeige import display_sensitive_data
 from login import login
 import add_person
+import home
 
 
 
@@ -26,9 +28,10 @@ if 'authenticated' not in st.session_state:
 st.sidebar.title("Menü")
 menu = st.sidebar.radio("Seiten", ["Home", "Login", "EKG Daten", "Neue Person anlegen"])
 
+
 if menu == "Home":
-    st.title("Home")
-    st.write("Willkommen auf der Home-Seite. Hier findest du allgemeine Informationen über die App.")
+    home.show_home_page()  # Aufruf der Funktion zur Anzeige der Home-Seite
+    
 
 elif menu == "Login":
     if not st.session_state['authenticated']:
