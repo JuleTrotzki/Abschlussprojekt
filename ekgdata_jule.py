@@ -1,6 +1,7 @@
 import json
 import pandas as pd
 import plotly.graph_objs as go
+import os
 
 
 
@@ -15,10 +16,20 @@ class EKGdata:
     def __init__(self, ekg_dict):
         pass
         self.id = ekg_dict["id"]
-        self.date = ekg_dict["date"]
+        #self.date = ekg_dict["date"]
         self.data = ekg_dict["result_link"]
-        self.df = pd.read_csv(self.data, sep='\t', header=None, names=['EKG in mV','Time in ms',])
+        if self.data is None:
+            raise ValueError("EKG data does not contain 'result_link'")
+        
+        if self.data.endswith(".csv"):
+            self.df = pd.read_csv(self.data)
+        elif self.data.endswith(".txt"):
+            self.df = pd.read_csv(self.data, sep='\t', header=None, names=['EKG in mV', 'Time in ms'])
+        else:
+            raise ValueError("Unsupported file format")
+        
         self.df['Time in s'] = self.df['Time in ms'] / 1000
+
     
     @staticmethod  
     def load_ekg_data():
@@ -26,18 +37,69 @@ class EKGdata:
         ekg_data = json.load(file)
         return ekg_data
     
+    
+    
+    #def load_by_id(test_id):
+    # Zuerst nach bereits vorhandenen Personen suchen
+    #    with open("data/person_db.json") as file:
+    #        ekg_data = json.load(file)
+    #        for person in ekg_data:
+    #            for ekg_test in person["ekg_tests"]:
+    #                if ekg_test["id"] == test_id:
+    #                    return ekg_test
+            
+    # Falls nicht in vorhandenen Personen gefunden, nach neu angelegten Personen suchen
+    #    ekg_dir = "ekg_data"
+    #    for file_name in os.listdir(ekg_dir):
+     #       if file_name.startswith(f"{test_id}_"):
+    #            file_path = os.path.join(ekg_dir, file_name)
+    #        
+    #            if file_path.endswith(".csv"):
+    #                try:
+    #                    df = pd.read_csv(file_path)
+    #                    #return {"id": test_id, "result_link": file_path}
+    #                    return df 
+    #                except Exception as e:
+    #                    print(f"Fehler beim Laden der CSV-Datei '{file_path}': {str(e)}")
+    #                    return None
+    #            elif file_path.endswith(".txt"):
+    #                try:
+    #                    df = pd.read_csv(file_path, delimiter="\t")
+    #                    return {"id": test_id, "result_link": file_path}
+    #                except Exception as e:
+    #                    print(f"Fehler beim Laden der TXT-Datei '{file_path}': {str(e)}")
+    #                    return None
+    #            else:
+    #                print(f"Datei '{file_path}' hat eine nicht unterstützte Dateiendung.")
+    #                return None
+   # 
+    #    print(f"Keine Datei für Test ID '{test_id}' gefunden.")
+    #    return None
+    
+    
+    @staticmethod
     def load_by_id(test_id):
         with open("data/person_db.json") as file:
-            ekg_data = json.load(file)
-            for person in ekg_data:
+            person_data = json.load(file)
+            for person in person_data:
                 for ekg_test in person["ekg_tests"]:
                     if ekg_test["id"] == test_id:
-                        return ekg_test
-        return {}
-
+                        if "result_link" in ekg_test:
+                            return {"id": test_id, "result_link": ekg_test["result_link"]}
+        
+        ekg_dir = "ekg_data"
+        for file_name in os.listdir(ekg_dir):
+            if file_name.startswith(f"{test_id}_"):
+                file_path = os.path.join(ekg_dir, file_name)
+                return {"id": test_id, "result_link": file_path}
+        
+        print(f"Keine Datei für Test ID '{test_id}' gefunden.")
+        return None
+    
+    
 
     @staticmethod  
-    def find_peaks(series, threshold, respacing_factor=5):
+    def find_peaks(series, threshold=345, respacing_factor=1):
    
         # Respace the series
         series = series.iloc[::respacing_factor]
@@ -61,9 +123,9 @@ class EKGdata:
         return peaks
 
         
-    def calculate_HR(peaks, sampling_rate=1000, smooth_window_size=None):
+    def calculate_HR(peaks, sampling_rate=1000, smooth_window_size=5):
     
-        timepoints = [peak / 1000 for peak in peaks[1:]]
+        timepoints = [peak / sampling_rate for peak in peaks[1:]]
         
         peak_intervals = pd.Series(peaks).diff().iloc[1:] / sampling_rate
         heart_rates = 60 / peak_intervals
@@ -71,13 +133,12 @@ class EKGdata:
         # Glättung der Herzfrequenzdaten durch Moving Average
         smoothed_heart_rates = heart_rates.rolling(window=smooth_window_size, min_periods=1).mean()
     
-        
-    
         df = pd.DataFrame({'Zeitpunkt': timepoints, 'Herzfrequenz': smoothed_heart_rates})
-        
+       
+
         return df
     
-    
+        
 
     def plot_time_series(df, peaks, start_index=None, end_index=None):
         
@@ -117,40 +178,7 @@ class EKGdata:
             yaxis_title='EKG in mV',
             showlegend=True)
 
-        return fig
-    
-if __name__ == "__main__":
-    print("This is a module with some functions to read the EKG data")
-    file = open("data/person_db.json")
-    person_data = json.load(file)
-    ekg_dict = person_data[0]["ekg_tests"][0]
-    print(ekg_dict)
-    ekg = EKGdata(ekg_dict)
-    print(ekg.df.head())
-    
-    # Beispielaufruf der Methode load_by_id
-    test_id = 1
-    ekg_test_data = EKGdata.load_by_id(test_id)
-
-    if ekg_test_data:
-        print("Gefundene EKG-Testdaten:")
-        print(ekg_test_data)
-    else:
-        print("EKG-Test mit der angegebenen ID wurde nicht gefunden.")
         
-    # Beispielaufruf find_peaks
-    file_path = "data/ekg_data/01_Ruhe.txt"
-    ekg_data = pd.read_csv(file_path, sep='\t', header=None, names=['EKG in mV', 'Time in ms'])
-    threshold = 345
-    peaks = EKGdata.find_peaks(ekg_data['EKG in mV'], threshold)
-    print("Gefundene Peaks:", peaks)
-    fig = EKGdata.plot_time_series(ekg_data, peaks)
-    fig.show()
-    
-    # Beispielaufruf estimate_HR
-    heart_rate = EKGdata.calculate_HR(peaks)
-    print("Geschätzte Herzfrequenz:", heart_rate, "Schläge pro Minute")
-    
-    
+        return fig
 
-    
+
