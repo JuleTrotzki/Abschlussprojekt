@@ -2,6 +2,7 @@ import json
 import pandas as pd
 import plotly.graph_objs as go
 import os
+from fitparse import FitFile
 
 
 
@@ -16,7 +17,6 @@ class EKGdata:
     def __init__(self, ekg_dict):
         pass
         self.id = ekg_dict["id"]
-        #self.date = ekg_dict["date"]
         self.data = ekg_dict["result_link"]
         if self.data is None:
             raise ValueError("EKG data does not contain 'result_link'")
@@ -25,10 +25,15 @@ class EKGdata:
             self.df = pd.read_csv(self.data)
         elif self.data.endswith(".txt"):
             self.df = pd.read_csv(self.data, sep='\t', header=None, names=['EKG in mV', 'Time in ms'])
+        elif self.data.endswith(".fit"):
+            self.df = self.load_fit_data(self.data)
         else:
             raise ValueError("Unsupported file format")
         
-        self.df['Time in s'] = self.df['Time in ms'] / 1000
+        if 'Time in ms' in self.df.columns:
+            self.df['Time in s'] = self.df['Time in ms'] / 1000
+        else:
+            self.df['Time in s'] = self.df.index
 
     
     @staticmethod  
@@ -38,43 +43,17 @@ class EKGdata:
         return ekg_data
     
     
-    
-    #def load_by_id(test_id):
-    # Zuerst nach bereits vorhandenen Personen suchen
-    #    with open("data/person_db.json") as file:
-    #        ekg_data = json.load(file)
-    #        for person in ekg_data:
-    #            for ekg_test in person["ekg_tests"]:
-    #                if ekg_test["id"] == test_id:
-    #                    return ekg_test
-            
-    # Falls nicht in vorhandenen Personen gefunden, nach neu angelegten Personen suchen
-    #    ekg_dir = "ekg_data"
-    #    for file_name in os.listdir(ekg_dir):
-     #       if file_name.startswith(f"{test_id}_"):
-    #            file_path = os.path.join(ekg_dir, file_name)
-    #        
-    #            if file_path.endswith(".csv"):
-    #                try:
-    #                    df = pd.read_csv(file_path)
-    #                    #return {"id": test_id, "result_link": file_path}
-    #                    return df 
-    #                except Exception as e:
-    #                    print(f"Fehler beim Laden der CSV-Datei '{file_path}': {str(e)}")
-    #                    return None
-    #            elif file_path.endswith(".txt"):
-    #                try:
-    #                    df = pd.read_csv(file_path, delimiter="\t")
-    #                    return {"id": test_id, "result_link": file_path}
-    #                except Exception as e:
-    #                    print(f"Fehler beim Laden der TXT-Datei '{file_path}': {str(e)}")
-    #                    return None
-    #            else:
-    #                print(f"Datei '{file_path}' hat eine nicht unterstützte Dateiendung.")
-    #                return None
-   # 
-    #    print(f"Keine Datei für Test ID '{test_id}' gefunden.")
-    #    return None
+    def load_fit_data(self, fit_file):
+        fit_file = FitFile(fit_file)
+        records = []
+        for record in fit_file.get_messages():
+            record_data = {}
+            for field in record:
+                record_data[field.name] = field.value
+            records.append(record_data)
+        hr_data = pd.DataFrame(records)
+        hr_data['Time in s'] = hr_data.index
+        return hr_data
     
     
     @staticmethod
@@ -181,4 +160,22 @@ class EKGdata:
         
         return fig
 
+    @staticmethod
+    def plot_fit_data(df):
+        fig = go.Figure()
 
+        # Herzfrequenz über Zeit plotten, falls vorhanden
+        if 'heart_rate' in df.columns:
+            fig.add_trace(go.Scatter(
+                x=df['Time in s'],
+                y=df['heart_rate'],
+                mode='lines',
+                name='Herzfrequenz'))
+            
+            # Layout anpassen
+            fig.update_layout(
+                title='Herzfrequenz',
+                xaxis_title='Zeit',
+                yaxis_title='Herzfrequenz (Schläge / min)')
+        
+        return fig

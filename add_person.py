@@ -4,6 +4,7 @@ import json
 import os
 import datetime as dt
 from datetime import datetime
+from fitparse import FitFile
 
 def add_person():
     st.header("Neue Person anlegen")
@@ -12,7 +13,7 @@ def add_person():
     lastname = st.text_input("Nachname")
     birth_year = st.number_input("Geburtsjahr", min_value=1900, max_value=2100, value=2000, step=1)
     picture_path = st.file_uploader("Bild hochladen", type=["jpg", "jpeg", "png"])
-    ekg_file = st.file_uploader("EKG-Daten hochladen", type=["csv", "txt"])
+    ekg_file = st.file_uploader("EKG-Daten hochladen", type=["csv", "txt", "fit"])
 
     if st.button("Person speichern"):
         if not firstname or not lastname or not birth_year:

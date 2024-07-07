@@ -63,39 +63,54 @@ def display_sensitive_data():
                 ekg_data = EKGdata(ekg_test_data)
                 st.subheader("EKG-Daten")
 
-                col1, col2 = st.columns([3, 1])
-                with col1:
-
-                    peaks = EKGdata.find_peaks(ekg_data.df['EKG in mV'], threshold=345)
-                    heart_rate_df = EKGdata.calculate_HR(peaks, st.session_state.sampling_rate, st.session_state.smooth_window_size)
-
-                    fig = EKGdata.plot_time_series(ekg_data.df, peaks, st.session_state.start_index, st.session_state.end_index)
-                    st.plotly_chart(fig)
-           
+                file_extension = os.path.splitext(ekg_test_data['result_link'])[1].lower()
                 
-                
-                # Plot der Herzfrequenz
-                heart_rate_fig = go.Figure()
-                heart_rate_fig.add_trace(go.Scatter(
-                    x=heart_rate_df['Zeitpunkt'],
-                    y=heart_rate_df['Herzfrequenz'],
-                    mode='lines',
-                    name='Herzfrequenz'))
+                if file_extension == '.fit':
+                        fit_fig = ekg_data.plot_fit_data(ekg_data.df)
+                        st.plotly_chart(fit_fig, use_container_width=True)
+                        
+                else:
+                    if 'EKG in mV' in ekg_data.df.columns:
+                        col1, col2 = st.columns([3, 1])
+                        with col1:
+                            peaks = EKGdata.find_peaks(ekg_data.df['EKG in mV'])
+                            fig = EKGdata.plot_time_series(ekg_data.df, peaks, st.session_state.start_index, st.session_state.end_index)
+                            st.plotly_chart(fig, use_container_width=True)
+                            
+                            # Plot der Herzfrequenz
+                            heart_rate_df = EKGdata.calculate_HR(peaks, st.session_state.sampling_rate, st.session_state.smooth_window_size)
+                        
+                            heart_rate_fig = go.Figure()
+                            heart_rate_fig.add_trace(go.Scatter(
+                                x=heart_rate_df['Zeitpunkt'],
+                                y=heart_rate_df['Herzfrequenz'],
+                                mode='lines',
+                                name='Herzfrequenz'))
 
-                heart_rate_fig.update_layout(
-                    title='Herzfrequenz',
-                    xaxis_title='Zeit (s)',
-                    yaxis_title='Herzfrequenz (Schläge pro Minute)',
-                    showlegend=True)
-                st.plotly_chart(heart_rate_fig)
-                    
-                    
-                # Eingabe threshold, start_index und end_index
-                with col2:
-                    st.session_state.end_index = st.slider("Wähle die Länge des Zeitbereichs:", min_value=0, max_value=len(ekg_data.df), value=10000)
-                    st.session_state.sampling_rate = st.slider("Wähle die Abtastrate:", min_value=1, max_value=10000, value=1000)
-                    st.session_state.smooth_window_size = st.slider("Wähle die Auflösung der Herzfrequenz-Anzeige:", min_value=1, max_value=1000, value=100)
+                            heart_rate_fig.update_layout(
+                                title='Herzfrequenz',
+                                xaxis_title='Zeit (s)',
+                                yaxis_title='Herzfrequenz (Schläge pro Minute)',
+                                showlegend=True)
+                            st.plotly_chart(heart_rate_fig)
+                            
+                        # Eingabe threshold, start_index und end_index
+                        with col2:
+                            st.session_state.end_index = st.slider("Wähle die Länge des Zeitbereichs:", min_value=0, max_value=len(ekg_data.df), value=5000)
+                            #st.session_state.sampling_rate = st.slider("Wähle die Abtastrate:", min_value=1, max_value=10000, value=1000)
+                            #st.session_state.smooth_window_size = st.slider("Wähle die Auflösung der Herzfrequenz-Anzeige:", min_value=1, max_value=1000, value=100)
             
+
+                    else:
+                        st.warning("Keine gültigen EKG-Daten gefunden.")
+                
+             
+                    
+
+                     
+                    
+                    
+                
             else:
                 st.error(f"Keine EKG-Daten für Test ID {selected_test_id} gefunden.")
                 

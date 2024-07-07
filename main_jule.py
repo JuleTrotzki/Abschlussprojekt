@@ -14,7 +14,7 @@ if 'threshold' not in st.session_state:
 if 'start_index' not in st.session_state:
     st.session_state.start_index = 0
 if 'end_index' not in st.session_state:
-    st.session_state.end_index = 10000
+    st.session_state.end_index = None
 if 'sampling_rate' not in st.session_state:
     st.session_state.sampling_rate = 1000
 if 'smooth_window_size' not in st.session_state:

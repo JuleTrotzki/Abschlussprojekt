@@ -30,7 +30,7 @@ def read_fit_file(file_path):
     return df
 
 # Pfad zur .fit-Datei
-file_path = 'data/long_endurance_ride.fit'
+file_path = 'data/vo2_max_training.fit'
 
 # Aufrufen der Funktion und Speichern des DataFrames
 df = read_fit_file(file_path)
