@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.graph_objs as go
 import os
 from fitparse import FitFile
+import numpy as np
 
 
 
@@ -101,7 +102,7 @@ class EKGdata:
 
         return peaks
 
-        
+    #Herzfrequenz   
     def calculate_HR(peaks, sampling_rate=1000, smooth_window_size=5):
     
         timepoints = [peak / sampling_rate for peak in peaks[1:]]
@@ -116,6 +117,24 @@ class EKGdata:
        
 
         return df
+    
+    
+    #Herzratenvariabilität
+    @staticmethod
+    def calculate_HRV(peaks, sampling_rate=1000):
+        peak_intervals = np.diff(peaks) / sampling_rate
+        sdnn = np.std(peak_intervals)
+        rmssd = np.sqrt(np.mean(np.square(np.diff(peak_intervals))))
+        nn50 = np.sum(np.abs(np.diff(peak_intervals)) > 0.05)
+        pnn50 = nn50 / len(peak_intervals) * 100
+
+        hrv_metrics = {
+            'SDNN': sdnn,
+            'RMSSD': rmssd,
+            'NN50': nn50,
+            'PNN50': pnn50
+        }
+        return hrv_metrics
     
         
 
@@ -179,3 +198,5 @@ class EKGdata:
                 yaxis_title='Herzfrequenz (Schläge / min)')
         
         return fig
+    
+    

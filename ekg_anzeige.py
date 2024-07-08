@@ -191,7 +191,9 @@ def display_sensitive_data(get_text):
                             
                             # Plot der Herzfrequenz
                             heart_rate_df = EKGdata.calculate_HR(peaks, st.session_state.sampling_rate, st.session_state.smooth_window_size)
-                        
+
+                            hrv_metrics = EKGdata.calculate_HRV(peaks, st.session_state.sampling_rate)
+                            
                             heart_rate_fig = go.Figure()
                             heart_rate_fig.add_trace(go.Scatter(
                                 x=heart_rate_df['Zeitpunkt'],
@@ -207,6 +209,16 @@ def display_sensitive_data(get_text):
                                 showlegend=True
                             )
                             st.plotly_chart(heart_rate_fig)
+                            
+                            st.subheader("Herzratenvariabilität")
+                            st.write(f"SDNN (Standard Deviation of the NN Intervall) ist die Standardabweichung der Zeitdifferenzen zwischen aufeinanderfolgenden Herzschlägen (RR-Intervalle). Sie repräsentiert die Gesamtvariabilität der Herzfrequenz über einen bestimmten Zeitraum und ist ein allgemeines Maß für die HRV.")
+                            st.write(f"**SDNN**: {hrv_metrics['SDNN']:.2f} s")
+                            st.write(f"RMSSD (Root Mean Square of Successive Differences) ist einer der wichtigsten Parameter, der Auskunft über die Aktivität des Parasympathikus gibt. Er beschreibt die kurzzeitige Variabilität des Herzschlags, wie stark sich die Herzfrequenz von einem zu nächsten Herzschlag ändert.")
+                            st.write(f"**RMSSD**: {hrv_metrics['RMSSD']:.2f} s")
+                            st.write(f"NN50 ist die Anzahl der Paare von RR-Intervallen, die mehr als 50ms auseinander liegen.")
+                            st.write(f"**NN50**: {hrv_metrics['NN50']}")
+                            st.write(f"pNN50 ist der Prozentsatz an Paaren von RR-Intervallen, die mehr als 50ms auseinander liegen. ")
+                            st.write(f"**pNN50**: {hrv_metrics['PNN50']:.2f} %")
                             
                         # Eingabe threshold, start_index und end_index
                         with col2:

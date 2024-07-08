@@ -34,7 +34,7 @@
 import streamlit as st
 
 def show_home_page(get_text):
-    st.title(get_text({"Deutsch": "Home", "English": "Home"}))
+    
 
     # Title and Logo
     col1, col2 = st.columns([3, 1])
@@ -45,6 +45,8 @@ def show_home_page(get_text):
             unsafe_allow_html=True)
     with col2:
         st.image('Logo.png')
+
+    st.title(get_text({"Deutsch": "Home", "English": "Home"}))
 
     # Introduction text
     st.write(get_text({
