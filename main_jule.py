@@ -95,23 +95,23 @@ language = option_menu(
 # Update session state with selected language
 st.session_state.language = language
 
+# Function to get text based on selected language
+def get_text(texts):
+    return texts[st.session_state.language]
+
 # Sidebar Navigation
-st.sidebar.title("Menü")
-menu = st.sidebar.radio("Seiten", ["Home", "Login", "EKG Daten", "Neue Person anlegen"])
+st.sidebar.title(get_text({"Deutsch": "Menü", "English": "Menu"}))
+menu = st.sidebar.radio(get_text({"Deutsch": "Seiten", "English": "Pages"}), [get_text({"Deutsch": "Home", "English": "Home"}), get_text({"Deutsch": "Login", "English": "Login"}), get_text({"Deutsch": "EKG Daten", "English": "EKG Data"}), get_text({"Deutsch": "Neue Person anlegen", "English": "Add New Person"})])
 
 # Update session state with selected page
 if menu == "Home":
     st.session_state.page = 'Home'
 elif menu == "Login":
     st.session_state.page = 'Login'
-elif menu == "EKG Daten":
-    st.session_state.page = 'EKG Daten'
-elif menu == "Neue Person anlegen":
-    st.session_state.page = 'Neue Person anlegen'
-
-# Function to get text based on selected language
-def get_text(texts):
-    return texts[st.session_state.language]
+elif menu == get_text({"Deutsch": "EKG Daten", "English": "EKG Data"}):
+    st.session_state.page = "EKG Daten"
+elif menu == get_text({"Deutsch": "Neue Person anlegen", "English": "Add New Person"}):
+    st.session_state.page = "Neue Person anlegen"
 
 # Page Rendering
 if st.session_state.page == "Home":
