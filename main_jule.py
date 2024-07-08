@@ -83,14 +83,28 @@ if 'page' not in st.session_state:
 
 # Sidebar Language Selection
 st.sidebar.title("Sprache / Language")
+rgb_value = (206, 21, 76)
+rgb_value_str = f"rgb{rgb_value}"
 language = option_menu(
     menu_title=None,  # required
     options=["Deutsch", "English"],  # required
     icons=["flag", "flag"],  # optional
     menu_icon="cast",  # optional
     default_index=0,  # optional
-    orientation="horizontal",
+    orientation="horizontal", 
+    styles={
+        "container": {"padding": "0px !important", "background-color": "#f0f0f0"},
+        "icon": {"color": "white", "font-size": "15px"},
+        "nav-link": {
+            "font-size": "12px",
+            "text-align": "center",
+            "margin": "0px",
+            "color": "#333",
+        },
+        "nav-link-selected": {"background-color": rgb_value_str, "color": "white"},
+    }
 )
+
 
 # Update session state with selected language
 st.session_state.language = language
