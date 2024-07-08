@@ -64,6 +64,10 @@
 #     show_home_page()
 
 import streamlit as st
+from login import show_login_page
+from login import VALID_USERS, authenticate
+
+
 
 def show_home_page(get_text):
 
@@ -80,7 +84,7 @@ def show_home_page(get_text):
 
     st.title(get_text({"Deutsch": "Home", "English": "Home"}))
 
-# Display uploaded image below the logo
+    # Display uploaded image below the logo
     st.image('run.png')
     # Introduction text
     st.write(get_text({
@@ -89,8 +93,7 @@ def show_home_page(get_text):
     }))
 
     st.write("### " + get_text({"Deutsch": "Funktionen der App", "English": "App Features"}))
-    if st.button(get_text({"Deutsch": "Login", "English": "Login"})):
-        st.session_state.page = 'Login'
+    st.write(get_text({"Deutsch": "- logge dich zuerst ein!", "English": "- first login!"}))
     st.write(get_text({"Deutsch": "- Lade deine Trainingsdaten hoch", "English": "- Upload your training data"}))
     st.write(get_text({"Deutsch": "- Lass deine Daten auswerten und in einem Diagramm anzeigen", "English": "- Analyze your data and display it in a chart"}))
 
