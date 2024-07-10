@@ -1,0 +1,4 @@
+streamlit
+tinydb
+sqlalchemy
+streamlit-option-menu
