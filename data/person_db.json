@@ -59,5 +59,13 @@
                 "result_link": "ekg_data\\tempo_blocks_training.fit"
             }
         ]
+    },
+    {
+        "id": 7,
+        "firstname": "lenard",
+        "lastname": "lenni",
+        "date_of_birth": "2002",
+        "picture_path": "uploaded_pictures\\20210926-DSC00137.JPG",
+        "ekg_tests": []
     }
 ]

@@ -67,22 +67,3 @@ class Person:
                 return eintrag
         return {}
         
-
-
-
-if __name__ == "__main__":
-    print("This is a module with some functions to read the person data")
-    persons = Person.load_person_data()
-    person_names = Person.get_person_list(persons)
-    print(person_names)
-    print(Person.find_person_data_by_name("Huber, Julian"))
-    
-    person1_dict = Person.find_person_data_by_name("Huber, Julian")
-    person1 = Person(person1_dict)
-    print(person1)
-    print(person1.calc_age())
-    print(person1.calc_max_heart_rate())
-    
-    person_id = 3
-    person_data = Person.load_by_id(person_id)
-    print(person_data)
