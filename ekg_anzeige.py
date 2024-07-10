@@ -224,6 +224,6 @@ def display_sensitive_data(get_text):
                         with col2:
                             st.session_state.end_index = st.slider(
                                 get_text({"Deutsch": "Wähle die Länge des Zeitbereichs:", "English": "Select the length of the time range:"}), 
-                                min_value=0, max_value=len(ekg_data.df), value=5000)
+                                min_value=0, max_value=len(ekg_data.df), value=int(len(ekg_data.df)/20))
                             # st.session_state.sampling_rate = st.slider(get_text({"Deutsch": "Wähle die Abtastrate:", "English": "Select the sampling rate:"}), min_value=1, max_value=10000, value=1000)
                             # st.session_state.smooth_window_size = st.slider(get_text({"Deutsch": "
