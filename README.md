@@ -18,13 +18,13 @@ Diese BeatAnalyzer-App ermöglicht es Benutzern, EKG-Daten von verschiedenen Per
 
 2. **Erstelle ein virtuelles Environment und installiere die Abhängigkeiten:**
     python -m venv .venv
-    source .venv/bin/activate  # Auf Windows: .venv\Scripts\activate
+    .venv\Scripts\activate
 
     Installiere die erforderlichen Abhängigkeiten:
     pip install -r requirements.txt
 
 ## Verwendung
-    Öffne eine Befehlszeile, navigiere zum Projektordner und führe den folgenden Befehl aus, um das Programm auszuführen:
+Öffne eine Befehlszeile, navigiere zum Projektordner und führe den folgenden Befehl aus, um das Programm auszuführen:
 
 streamlit run main.py
 
